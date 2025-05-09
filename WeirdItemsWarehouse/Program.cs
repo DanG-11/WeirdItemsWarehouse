@@ -147,7 +147,7 @@
 
         public Warehouse select_warehouse()
         {
-            Console.WriteLine("Select a warehouse (Number equal or more than 0): ");
+            Console.WriteLine("Select a warehouse (Integer): ");
             for (int i = 0; i < warehouses.Count; i++)
             {
                 Console.WriteLine($"{i}. Warehouse {i + 1} - Capacity: {warehouses[i].maximum_capacity}, Max Weight: {warehouses[i].maximum_total_weight}");
@@ -161,7 +161,7 @@
             }
             else
             {
-                Console.WriteLine("Invalid selection.");
+                Console.WriteLine("This warehouse doesn't exist.");
                 return null;
             }
         }
