@@ -3,11 +3,11 @@
     class Item
     {
         public string name { get; set; }
-        public double weight_kg { get; set; }
+        public decimal weight_kg { get; set; }
         public int weirdness_level { get; set; }
         public bool is_fragile { get; set; }
 
-        public Item(string Name, double Weight_kg, int Weirdness_level, bool Is_fragile)
+        public Item(string Name, decimal Weight_kg, int Weirdness_level, bool Is_fragile)
         {
             name = Name;
             weight_kg = Weight_kg;
@@ -23,6 +23,59 @@
                    $"\t\"weirdness_level\": \"{weirdness_level}\",\n" +
                    $"\t\"is_fragile\": \"{(is_fragile ? "YES" : "NO")}\",\n" +
                    "}";
+        }
+    }
+
+    class Warehouse
+    {
+        private List<Item> items;
+        public int maximum_capacity { get; set; }
+        public decimal maximum_total_weight { get; set; }
+
+        public int current_amout_of_items => items.Count;
+
+        public Warehouse(int Maximum_capacity, decimal Maximum_total_weight)
+        {
+            maximum_capacity = Maximum_capacity;
+            maximum_total_weight = Maximum_total_weight;
+            items = new List<Item>();
+        }
+
+        public (bool, string) add_item_to_warehouse(Item item)
+        {
+            decimal current_weight = 0;
+
+            if (current_amout_of_items >= maximum_capacity)
+            {
+                return (false, "Error: The warehouse's full.");
+            }
+
+            foreach (var i in items)
+            {
+                current_weight += i.weight_kg;
+            }
+
+            if(current_weight + item.weight_kg > maximum_total_weight)
+            {
+                return (false, "Error: Exceeded the maximum weight for this warehouse.");
+            }
+
+            items.Add(item);
+            return (true, "Item added succesfully!");
+        }
+
+        public void print_all_items()
+        {
+            if (items.Count == 0)
+            {
+                Console.WriteLine("The warehouse's empty.");
+                return;
+            }
+
+            foreach (var item in items)
+            {
+                Console.WriteLine(item.Description());
+            }
         }
     }
 
