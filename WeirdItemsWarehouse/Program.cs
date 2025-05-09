@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace WeirdItemsWarehouse
+﻿namespace WeirdItemsWarehouse
 {
     class Item
     {
