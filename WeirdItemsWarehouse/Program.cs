@@ -32,7 +32,7 @@
         public int maximum_capacity { get; set; }
         public decimal maximum_total_weight { get; set; }
 
-        public int current_amout_of_items => items.Count;
+        public int current_amount_of_items => items.Count;
 
         public Warehouse(int Maximum_capacity, decimal Maximum_total_weight)
         {
@@ -45,7 +45,7 @@
         {
             decimal current_weight = 0;
 
-            if (current_amout_of_items >= maximum_capacity)
+            if (current_amount_of_items >= maximum_capacity)
             {
                 return (false, "Error: The warehouse's full.");
             }
@@ -60,8 +60,24 @@
                 return (false, "Error: Exceeded the maximum weight for this warehouse.");
             }
 
+            if (item.weirdness_level == 7 && item.is_fragile && current_amount_of_items >= maximum_capacity / 2)
+            {
+                return (false, "Error: The item is too risky with current warehouse capacity. (It's fragile and it's weirdness is level 7)");
+            }
+
             items.Add(item);
             return (true, "Item added succesfully!");
+        }
+
+        public (bool, string) remove_item_from_warehouse(string item_name)
+        {
+            //Ten ziutek przeszukuje liste, zwraza pierwszy element który określił warunek, porównuje co ja chce usunąć z tym co jest w warehouse i ignoruje różnicę w małuch i dużych literach.
+            var item = items.FirstOrDefault(i => i.name.Equals(item_name, StringComparison.OrdinalIgnoreCase));
+            if (item == null)
+                return (false, "Error: The item has not been found.");
+
+            items.Remove(item);
+            return (true, "The item has been removed successfully!");
         }
 
         public void print_all_items()
@@ -77,18 +93,45 @@
                 Console.WriteLine(item.Description());
             }
         }
+
+        public void print_fragile_or_heavy_items(decimal weight_threshold)
+        {
+            var filtered_items = items.Where(i => i.is_fragile || i.weight_kg > weight_threshold).ToList();
+            if (filtered_items.Count == 0)
+            {
+                Console.WriteLine("There've been no fragile or heavy items found.");
+                return;
+            }
+
+            foreach (var item in filtered_items)
+            {
+                Console.WriteLine(item.Description());
+            }
+        }
+
+        public decimal calculate_average_weirdness()
+        {
+            if (items.Count != 0)
+            {
+                return Convert.ToDecimal(items.Average(i => i.weirdness_level));
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
 
     internal class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Collectible company Kuriozum Sp. z o. o.");
+            Console.WriteLine("Welcome to Kuriozum Collectibles Warehouse Sp. z o. o.");
 
-            Console.WriteLine("Warehouse capacity (Integer): ");
+            Console.WriteLine("Enter warehouse capacity (Integer): ");
             int capacity = Convert.ToInt32(Console.ReadLine());
 
-            Console.WriteLine("Maximum total weight of the warehouse (Kg): ");
+            Console.WriteLine("Enter maximum total weight of the warehouse (Kg): ");
             decimal maxWeight = Convert.ToDecimal(Console.ReadLine());
 
             Warehouse warehouse = new Warehouse(capacity, maxWeight);
