@@ -1,4 +1,6 @@
-﻿namespace WeirdItemsWarehouse
+﻿using System.Globalization;
+
+namespace WeirdItemsWarehouse
 {
     class Item
     {
@@ -17,7 +19,7 @@
 
         public string Description()
         {
-            return "{\n\t Item description:" +
+            return "{\n\t Item description:\n" +
                    $"\t\"name\": \"{name}\",\n" +
                    $"\t\"weight_kg\": \"{weight_kg}\",\n" +
                    $"\t\"weirdness_level\": \"{weirdness_level}\",\n" +
@@ -83,6 +85,58 @@
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Collectible company Kuriozum Sp. z o. o.");
+
+            Console.WriteLine("Warehouse capacity (Integer): ");
+            int capacity = Convert.ToInt32(Console.ReadLine());
+
+            Console.WriteLine("Maximum total weight of the warehouse (Kg): ");
+            decimal maxWeight = Convert.ToDecimal(Console.ReadLine());
+
+            Warehouse warehouse = new Warehouse(capacity, maxWeight);
+
+            while (true)
+            {
+                Console.Write("""
+                              Choose an option:
+                              1. Add item
+                              2. List out all the items
+                              3. Exit
+                              """ + "\n");
+                string option = Console.ReadLine();
+
+                if (option == "1")
+                {
+                    Console.WriteLine("Item name: ");
+                    string name = Console.ReadLine();
+
+                    Console.WriteLine("Weight (Kg): ");
+                    decimal weight = Convert.ToDecimal(Console.ReadLine());
+
+                    Console.WriteLine("Weirdness level (1-10): ");
+                    int weirdness = Convert.ToInt32(Console.ReadLine());
+
+                    Console.WriteLine("Is it fragile? (YES/NO): ");
+                    bool isFragile = Console.ReadLine().Trim().ToLower() == "YES";
+
+                    Item item = new Item(name, weight, weirdness, isFragile);
+                    var (success, message) = warehouse.add_item_to_warehouse(item);
+                    Console.WriteLine(message);
+                }
+                else if (option == "2")
+                {
+                    warehouse.print_all_items();
+                }
+                else if (option == "3")
+                {
+                    Console.WriteLine("Shutting down the program...");
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid option.");
+                }
+            }
         }
     }
 }
