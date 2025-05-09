@@ -122,51 +122,146 @@
         }
     }
 
+    class WarehouseController
+    {
+        private List<Warehouse> warehouses;
+
+        public WarehouseController()
+        {
+            warehouses = new List<Warehouse>();
+        }
+
+        public void create_new_warehouse()
+        {
+            Console.WriteLine("Enter the warehouse capacity (Integer): ");
+            int capacity = Convert.ToInt32(Console.ReadLine());
+
+            Console.WriteLine("Enter the maximum total weight of the warehouse (Kg): ");
+            decimal maxWeight = Convert.ToDecimal(Console.ReadLine());
+
+            var warehouse = new Warehouse(capacity, maxWeight);
+            warehouses.Add(warehouse);
+
+            Console.WriteLine("The new warehouse has been created successfully.");
+        }
+
+        public Warehouse select_warehouse()
+        {
+            Console.WriteLine("Select a warehouse (Number equal or more than 0): ");
+            for (int i = 0; i < warehouses.Count; i++)
+            {
+                Console.WriteLine($"{i}. Warehouse {i + 1} - Capacity: {warehouses[i].maximum_capacity}, Max Weight: {warehouses[i].maximum_total_weight}");
+            }
+
+            int index = Convert.ToInt32(Console.ReadLine());
+
+            if (index >= 0 && index < warehouses.Count)
+            {
+                return warehouses[index];
+            }
+            else
+            {
+                Console.WriteLine("Invalid selection.");
+                return null;
+            }
+        }
+    }
+
     internal class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to Kuriozum Collectibles Warehouse Sp. z o. o.");
+            Console.WriteLine("Collectible company Kuriozum Sp. z o. o.");
 
-            Console.WriteLine("Enter warehouse capacity (Integer): ");
-            int capacity = Convert.ToInt32(Console.ReadLine());
-
-            Console.WriteLine("Enter maximum total weight of the warehouse (Kg): ");
-            decimal maxWeight = Convert.ToDecimal(Console.ReadLine());
-
-            Warehouse warehouse = new Warehouse(capacity, maxWeight);
+            WarehouseController warehouse_manager = new WarehouseController();
 
             while (true)
             {
                 Console.Write("""
                               Choose an option:
-                              1. Add item
-                              2. List out all the items
+                              1. Create new warehouse
+                              2. Work with existing warehouse
                               3. Exit
                               """ + "\n");
+
                 string option = Console.ReadLine();
 
                 if (option == "1")
                 {
-                    Console.WriteLine("Item name: ");
-                    string name = Console.ReadLine();
-
-                    Console.WriteLine("Weight (Kg): ");
-                    decimal weight = Convert.ToDecimal(Console.ReadLine());
-
-                    Console.WriteLine("Weirdness level (1-10): ");
-                    int weirdness = Convert.ToInt32(Console.ReadLine());
-
-                    Console.WriteLine("Is it fragile? (YES/NO): ");
-                    bool isFragile = Console.ReadLine().Trim().ToLower() == "YES";
-
-                    Item item = new Item(name, weight, weirdness, isFragile);
-                    var (success, message) = warehouse.add_item_to_warehouse(item);
-                    Console.WriteLine(message);
+                    warehouse_manager.create_new_warehouse();
                 }
                 else if (option == "2")
                 {
-                    warehouse.print_all_items();
+                    Warehouse selected_warehouse = warehouse_manager.select_warehouse();
+
+                    if (selected_warehouse != null)
+                    {
+                        while (true)
+                        {
+                            Console.Write("""
+                                          Choose an option:
+                                          1. Add item
+                                          2. Remove item
+                                          3. List all items
+                                          4. Calculate average weirdness
+                                          5. List fragile or heavy items
+                                          6. Return to main menu
+                                          """ + "\n");
+
+                            string warehouse_option = Console.ReadLine();
+
+                            if (warehouse_option == "1")
+                            {
+                                Console.WriteLine("Item name: ");
+                                string name = Console.ReadLine();
+
+                                Console.WriteLine("Weight (Kg): ");
+                                decimal weight = Convert.ToDecimal(Console.ReadLine());
+
+                                Console.WriteLine("Weirdness level (1-10): ");
+                                int weirdness = Convert.ToInt32(Console.ReadLine());
+
+                                Console.WriteLine("Is it fragile? (YES/NO): ");
+                                bool isFragile = Console.ReadLine().Trim().ToLower() == "yes";
+
+                                Item item = new Item(name, weight, weirdness, isFragile);
+                                var (success, message) = selected_warehouse.add_item_to_warehouse(item);
+                                Console.WriteLine(message);
+                            }
+                            else if (warehouse_option == "2")
+                            {
+                                Console.WriteLine("Enter the item name to remove: ");
+                                string item_name = Console.ReadLine();
+
+                                var (success, message) = selected_warehouse.remove_item_from_warehouse(item_name);
+                                Console.WriteLine(message);
+                            }
+                            else if (warehouse_option == "3")
+                            {
+                                selected_warehouse.print_all_items();
+                            }
+                            else if (warehouse_option == "4")
+                            {
+                                decimal average_weirdness = selected_warehouse.calculate_average_weirdness();
+                                Console.WriteLine($"Average weirdness in the warehouse: {average_weirdness}");
+                            }
+                            else if (warehouse_option == "5")
+                            {
+                                Console.WriteLine("Enter the weight threshold for heavy items: ");
+                                decimal weight_threshold = Convert.ToDecimal(Console.ReadLine());
+
+                                selected_warehouse.print_fragile_or_heavy_items(weight_threshold);
+                            }
+                            else if (warehouse_option == "6")
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("This option doesn't exist.");
+                            }
+                        }
+                    }
                 }
                 else if (option == "3")
                 {
@@ -175,7 +270,7 @@
                 }
                 else
                 {
-                    Console.WriteLine("Invalid option.");
+                    Console.WriteLine("This option doesn't exist.");
                 }
             }
         }
